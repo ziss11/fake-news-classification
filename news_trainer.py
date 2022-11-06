@@ -7,7 +7,7 @@ from tfx.components.trainer.fn_args_utils import FnArgs
 
 LABEL_KEY = "is_real"
 FEATURE_KEY = "text"
-NUM_EPOCHS = 30
+NUM_EPOCHS = 10
 
 def transformed_name(key): 
     return f"{key}_xf"
@@ -35,18 +35,18 @@ def model_builder(vectorizer_layer):
     inputs = tf.keras.Input(shape=(1,), name=transformed_name(FEATURE_KEY), dtype=tf.string)
 
     x = vectorizer_layer(inputs)
-    x = layers.Embedding(input_dim=5000, output_dim=64)(x)
-    x = layers.LSTM(128)(x)
-    x = layers.Dense(128, activation='relu')(x)
+    x = layers.Embedding(input_dim=5000, output_dim=128)(x)
+    x = layers.Bidirectional(layers.LSTM(128))(x)
+    x = layers.Dense(128, activation=tf.nn.relu)(x)
     x = layers.Dropout(0.5)(x)
-    x = layers.Dense(64, activation='relu')(x)
+    x = layers.Dense(64, activation=tf.nn.relu)(x)
     x = layers.Dropout(0.5)(x)
-    outputs = layers.Dense(6, activation='softmax')(x)
+    outputs = layers.Dense(1, activation=tf.nn.sigmoid)(x)
     
     model = tf.keras.Model(inputs=inputs, outputs = outputs)
 
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
+        optimizer=tf.keras.optimizers.Adam(),
         loss=tf.keras.losses.BinaryCrossentropy(),
         metrics=[tf.keras.metrics.BinaryAccuracy()],
     )
@@ -104,7 +104,7 @@ def run_fn(fn_args: FnArgs):
     vectorizer_layer = layers.TextVectorization(
         max_tokens=5000,
         output_mode="int",
-        output_sequence_length=30,
+        output_sequence_length=40,
     )
     vectorizer_layer.adapt(vectorizer_dataset)
     
