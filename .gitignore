@@ -1,5 +1,6 @@
 /__pycache__/
 /pipelines/
 /data/csv/news.csv
-serving_model.zip
-zizz1181-pipeline.zip
+/serving_model_dir/
+
+*.zip
