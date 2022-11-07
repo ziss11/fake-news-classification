@@ -3,5 +3,4 @@
 /data/csv/news.csv
 /serving_model_dir/
 
-*.py
 *.zip
